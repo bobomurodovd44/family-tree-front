@@ -1,0 +1,46 @@
+{
+  "Common": {
+    "appName": "ShajaraCMS",
+    "tagline": "Сохраните историю вашей семьи и передайте её потомкам",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "language": "Язык",
+    "localeUz": "Узбекский",
+    "localeRu": "Русский"
+  },
+  "Auth": {
+    "loginTitle": "Вход в аккаунт",
+    "loginSubtitle": "Введите электронную почту, чтобы продолжить",
+    "loginButton": "Войти",
+    "noAccount": "Нет аккаунта?",
+    "goToSignup": "Зарегистрируйтесь",
+    "signupTitle": "Создать аккаунт",
+    "signupSubtitle": "Заполните форму ниже, чтобы начать",
+    "signupButton": "Создать аккаунт",
+    "haveAccount": "Уже есть аккаунт?",
+    "goToLogin": "Войдите",
+    "fullName": "Полное имя",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "namePlaceholder": "Имя Фамилия",
+    "emailPlaceholder": "ism@example.com",
+    "emailHelp": "Мы будем использовать её для связи. Мы не передаём вашу почту третьим лицам.",
+    "passwordHelp": "Не менее 8 символов.",
+    "confirmHelp": "Повторите ваш пароль.",
+    "errors": {
+      "invalidCredentials": "Неверная почта или пароль.",
+      "emailTaken": "Эта почта уже зарегистрирована.",
+      "passwordsNoMatch": "Пароли не совпадают.",
+      "nameMin": "Пожалуйста, введите полное имя.",
+      "emailInvalid": "Неверный адрес электронной почты.",
+      "passwordMin": "Пароль должен содержать не менее 8 символов.",
+      "generic": "Произошла ошибка. Попробуйте ещё раз позже.",
+      "createdButLoginFailed": "Аккаунт создан, но войти не удалось. Пожалуйста, войдите снова."
+    }
+  },
+  "Home": {
+    "welcome": "Добро пожаловать, {name}",
+    "logout": "Выйти"
+  }
+}

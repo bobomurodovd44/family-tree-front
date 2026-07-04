@@ -6,8 +6,11 @@ const PUBLIC_ROUTES = ["/login", "/signup"]
 
 const SESSION_COOKIE = "shajara_session"
 
-// Optimistic auth check: only looks at cookie presence (no DB/network call).
-// Real validation happens server-side via getCurrentUser().
+// Optimistic guard: only looks at cookie presence (no DB/network call) to keep
+// unauthenticated users off protected routes. Real validation — and redirecting
+// an already-authenticated user away from the auth pages — happens server-side in
+// the pages via getCurrentUser(), so a stale/expired cookie can't cause a redirect
+// loop between "/" and "/login".
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hasSession = request.cookies.has(SESSION_COOKIE)
@@ -17,10 +20,6 @@ export function proxy(request: NextRequest) {
 
   if (!hasSession && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.nextUrl))
-  }
-
-  if (hasSession && isPublic) {
-    return NextResponse.redirect(new URL("/", request.nextUrl))
   }
 
   return NextResponse.next()

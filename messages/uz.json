@@ -1,0 +1,46 @@
+{
+  "Common": {
+    "appName": "ShajaraCMS",
+    "tagline": "Oilangiz tarixini saqlang va avlodlarga ulashing",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
+    "language": "Til",
+    "localeUz": "O'zbekcha",
+    "localeRu": "Ruscha"
+  },
+  "Auth": {
+    "loginTitle": "Hisobga kirish",
+    "loginSubtitle": "Davom etish uchun elektron pochtangizni kiriting",
+    "loginButton": "Kirish",
+    "noAccount": "Hisobingiz yo'qmi?",
+    "goToSignup": "Ro'yxatdan o'ting",
+    "signupTitle": "Hisob yaratish",
+    "signupSubtitle": "Boshlash uchun quyidagi shaklni to'ldiring",
+    "signupButton": "Hisob yaratish",
+    "haveAccount": "Hisobingiz bormi?",
+    "goToLogin": "Hisobga kiring",
+    "fullName": "To'liq ism",
+    "email": "Elektron pochta",
+    "password": "Parol",
+    "confirmPassword": "Parolni tasdiqlang",
+    "namePlaceholder": "Ism Familiya",
+    "emailPlaceholder": "ism@example.com",
+    "emailHelp": "Biz siz bilan shu orqali bog'lanamiz. Pochtangizni hech kim bilan ulashmaymiz.",
+    "passwordHelp": "Kamida 8 ta belgidan iborat bo'lishi kerak.",
+    "confirmHelp": "Parolingizni qayta kiriting.",
+    "errors": {
+      "invalidCredentials": "Elektron pochta yoki parol noto'g'ri.",
+      "emailTaken": "Bu elektron pochta allaqachon ro'yxatdan o'tgan.",
+      "passwordsNoMatch": "Parollar mos kelmadi.",
+      "nameMin": "Iltimos, to'liq ismingizni kiriting.",
+      "emailInvalid": "Elektron pochta manzili noto'g'ri.",
+      "passwordMin": "Parol kamida 8 ta belgidan iborat bo'lishi kerak.",
+      "generic": "Xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring.",
+      "createdButLoginFailed": "Hisob yaratildi, ammo tizimga kirishda xatolik. Iltimos, qayta kiring."
+    }
+  },
+  "Home": {
+    "welcome": "Xush kelibsiz, {name}",
+    "logout": "Chiqish"
+  }
+}

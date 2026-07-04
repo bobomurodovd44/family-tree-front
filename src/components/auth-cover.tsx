@@ -1,9 +1,12 @@
+import { getTranslations } from "next-intl/server"
 import { TreePineIcon } from "lucide-react"
 
 // Decorative side panel for the auth pages. Uses a subtle traditional Uzbek-style
 // geometric lattice (two overlapping squares form an 8-pointed "chorsi" star) over
 // a brand-tinted gradient. Self-contained — no external image asset needed.
-export function AuthCover() {
+export async function AuthCover() {
+  const t = await getTranslations("Common")
+
   return (
     <div className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:block">
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
@@ -42,10 +45,8 @@ export function AuthCover() {
         <span className="flex size-14 items-center justify-center rounded-2xl bg-primary-foreground/10">
           <TreePineIcon className="size-7" />
         </span>
-        <h2 className="text-2xl font-semibold tracking-tight">ShajaraCMS</h2>
-        <p className="max-w-xs text-sm text-primary-foreground/80">
-          Oilangiz tarixini saqlang va avlodlarga ulashing
-        </p>
+        <h2 className="text-2xl font-semibold tracking-tight">{t("appName")}</h2>
+        <p className="max-w-xs text-sm text-primary-foreground/80">{t("tagline")}</p>
       </div>
     </div>
   )

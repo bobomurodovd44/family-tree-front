@@ -26,15 +26,22 @@ export async function feathersFetch<T = unknown>(
 ): Promise<FeathersResponse<T>> {
   const { token, headers, ...rest } = options
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    cache: "no-store",
-  })
+  let res: Response
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...rest,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      cache: "no-store",
+    })
+  } catch {
+    // Backend unreachable (connection refused, DNS, etc.). Surface as a
+    // non-ok response so callers degrade gracefully instead of throwing.
+    return { ok: false, status: 0, data: null as T }
+  }
 
   const data = (await res.json().catch(() => null)) as T
   return { ok: res.ok, status: res.status, data }

@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 import { z } from "zod"
 
 import { feathersFetch, type FeathersErrorBody } from "@/lib/api"
@@ -17,14 +18,14 @@ export type SignupState =
 
 const SignupSchema = z
   .object({
-    name: z.string().min(2, "Please enter your full name."),
-    email: z.email("Please enter a valid email address."),
-    password: z.string().min(8, "Password must be at least 8 characters long."),
+    name: z.string().min(2),
+    email: z.email(),
+    password: z.string().min(8),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
-    message: "Passwords do not match.",
+    message: "passwordsNoMatch",
   })
 
 function str(value: FormDataEntryValue | null): string {
@@ -36,6 +37,8 @@ function raw(value: FormDataEntryValue | null): string {
 }
 
 export async function signup(_prev: SignupState, formData: FormData): Promise<SignupState> {
+  const t = await getTranslations("Auth.errors")
+
   const parsed = SignupSchema.safeParse({
     name: str(formData.get("name")),
     email: str(formData.get("email")).toLowerCase(),
@@ -44,10 +47,17 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
   })
 
   if (!parsed.success) {
+    // Map each failing field to a localized message.
+    const messageByField: Record<FieldName, string> = {
+      name: t("nameMin"),
+      email: t("emailInvalid"),
+      password: t("passwordMin"),
+      confirmPassword: t("passwordsNoMatch"),
+    }
     const fieldErrors: Partial<Record<FieldName, string>> = {}
     for (const issue of parsed.error.issues) {
       const key = issue.path[0] as FieldName | undefined
-      if (key && !fieldErrors[key]) fieldErrors[key] = issue.message
+      if (key && !fieldErrors[key]) fieldErrors[key] = messageByField[key]
     }
     return { fieldErrors }
   }
@@ -65,9 +75,9 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
       created.status === 409 ||
       /duplicate|e11000|exists|unique/i.test(created.data?.message ?? "")
     ) {
-      return { fieldErrors: { email: "This email is already registered." } }
+      return { fieldErrors: { email: t("emailTaken") } }
     }
-    return { error: "Something went wrong. Please try again." }
+    return { error: t("generic") }
   }
 
   // 2. Log in to obtain a token.
@@ -77,7 +87,7 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
   })
 
   if (!auth.ok || !auth.data?.accessToken) {
-    return { error: "Account created, but sign-in failed. Please log in." }
+    return { error: t("createdButLoginFailed") }
   }
 
   await createSession(auth.data.accessToken)

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useActionState } from "react"
+import { useTranslations } from "next-intl"
 import { Loader2Icon } from "lucide-react"
 
 import { signup, type SignupState } from "@/app/signup/actions"
@@ -15,11 +16,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/password-input"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const t = useTranslations("Auth")
   const [state, action, pending] = useActionState<SignupState, FormData>(
     signup,
     undefined
@@ -29,9 +32,9 @@ export function SignupForm({
     <form className={cn("flex flex-col gap-6", className)} action={action} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
+          <h1 className="text-2xl font-bold">{t("signupTitle")}</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            Fill in the form below to create your account
+            {t("signupSubtitle")}
           </p>
         </div>
         {state?.error && (
@@ -43,12 +46,12 @@ export function SignupForm({
           </p>
         )}
         <Field>
-          <FieldLabel htmlFor="name">Full Name</FieldLabel>
+          <FieldLabel htmlFor="name">{t("fullName")}</FieldLabel>
           <Input
             id="name"
             name="name"
             type="text"
-            placeholder="John Doe"
+            placeholder={t("namePlaceholder")}
             autoComplete="name"
             aria-invalid={Boolean(state?.fieldErrors?.name)}
             required
@@ -59,12 +62,12 @@ export function SignupForm({
           )}
         </Field>
         <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel htmlFor="email">{t("email")}</FieldLabel>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="m@example.com"
+            placeholder={t("emailPlaceholder")}
             autoComplete="email"
             aria-invalid={Boolean(state?.fieldErrors?.email)}
             required
@@ -73,18 +76,14 @@ export function SignupForm({
           {state?.fieldErrors?.email ? (
             <FieldError>{state.fieldErrors.email}</FieldError>
           ) : (
-            <FieldDescription>
-              We&apos;ll use this to contact you. We will not share your email
-              with anyone else.
-            </FieldDescription>
+            <FieldDescription>{t("emailHelp")}</FieldDescription>
           )}
         </Field>
         <Field>
-          <FieldLabel htmlFor="password">Password</FieldLabel>
-          <Input
+          <FieldLabel htmlFor="password">{t("password")}</FieldLabel>
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             aria-invalid={Boolean(state?.fieldErrors?.password)}
             required
@@ -93,17 +92,14 @@ export function SignupForm({
           {state?.fieldErrors?.password ? (
             <FieldError>{state.fieldErrors.password}</FieldError>
           ) : (
-            <FieldDescription>
-              Must be at least 8 characters long.
-            </FieldDescription>
+            <FieldDescription>{t("passwordHelp")}</FieldDescription>
           )}
         </Field>
         <Field>
-          <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-          <Input
+          <FieldLabel htmlFor="confirmPassword">{t("confirmPassword")}</FieldLabel>
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             autoComplete="new-password"
             aria-invalid={Boolean(state?.fieldErrors?.confirmPassword)}
             required
@@ -112,18 +108,18 @@ export function SignupForm({
           {state?.fieldErrors?.confirmPassword ? (
             <FieldError>{state.fieldErrors.confirmPassword}</FieldError>
           ) : (
-            <FieldDescription>Please confirm your password.</FieldDescription>
+            <FieldDescription>{t("confirmHelp")}</FieldDescription>
           )}
         </Field>
         <Field>
           <Button type="submit" disabled={pending}>
             {pending && <Loader2Icon className="animate-spin" />}
-            Create Account
+            {t("signupButton")}
           </Button>
           <FieldDescription className="text-center">
-            Already have an account?{" "}
+            {t("haveAccount")}{" "}
             <Link href="/login" className="underline underline-offset-4">
-              Sign in
+              {t("goToLogin")}
             </Link>
           </FieldDescription>
         </Field>

@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 import { z } from "zod"
 
 import { feathersFetch } from "@/lib/api"
@@ -27,13 +28,15 @@ function raw(value: FormDataEntryValue | null): string {
 }
 
 export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
+  const t = await getTranslations("Auth.errors")
+
   const parsed = LoginSchema.safeParse({
     email: str(formData.get("email")).toLowerCase(),
     password: raw(formData.get("password")),
   })
 
   if (!parsed.success) {
-    return { error: "Please enter a valid email and password." }
+    return { error: t("invalidCredentials") }
   }
 
   const auth = await feathersFetch<{ accessToken?: string }>("/authentication", {
@@ -46,7 +49,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   })
 
   if (!auth.ok || !auth.data?.accessToken) {
-    return { error: "Incorrect email or password." }
+    return { error: t("invalidCredentials") }
   }
 
   await createSession(auth.data.accessToken)
