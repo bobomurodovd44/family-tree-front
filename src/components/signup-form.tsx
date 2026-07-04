@@ -96,22 +96,6 @@ export function SignupForm({
           )}
         </Field>
         <Field>
-          <FieldLabel htmlFor="confirmPassword">{t("confirmPassword")}</FieldLabel>
-          <PasswordInput
-            id="confirmPassword"
-            name="confirmPassword"
-            autoComplete="new-password"
-            aria-invalid={Boolean(state?.fieldErrors?.confirmPassword)}
-            required
-            className="bg-background"
-          />
-          {state?.fieldErrors?.confirmPassword ? (
-            <FieldError>{state.fieldErrors.confirmPassword}</FieldError>
-          ) : (
-            <FieldDescription>{t("confirmHelp")}</FieldDescription>
-          )}
-        </Field>
-        <Field>
           <Button type="submit" disabled={pending}>
             {pending && <Loader2Icon className="animate-spin" />}
             {t("signupButton")}

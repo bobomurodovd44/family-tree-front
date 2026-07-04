@@ -7,7 +7,7 @@ import { z } from "zod"
 import { feathersFetch, type FeathersErrorBody } from "@/lib/api"
 import { createSession } from "@/lib/session"
 
-type FieldName = "name" | "email" | "password" | "confirmPassword"
+type FieldName = "name" | "email" | "password"
 
 export type SignupState =
   | {
@@ -16,17 +16,11 @@ export type SignupState =
     }
   | undefined
 
-const SignupSchema = z
-  .object({
-    name: z.string().min(2),
-    email: z.email(),
-    password: z.string().min(8),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "passwordsNoMatch",
-  })
+const SignupSchema = z.object({
+  name: z.string().min(2),
+  email: z.email(),
+  password: z.string().min(8),
+})
 
 function str(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : ""
@@ -43,7 +37,6 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
     name: str(formData.get("name")),
     email: str(formData.get("email")).toLowerCase(),
     password: raw(formData.get("password")),
-    confirmPassword: raw(formData.get("confirmPassword")),
   })
 
   if (!parsed.success) {
@@ -52,7 +45,6 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
       name: t("nameMin"),
       email: t("emailInvalid"),
       password: t("passwordMin"),
-      confirmPassword: t("passwordsNoMatch"),
     }
     const fieldErrors: Partial<Record<FieldName, string>> = {}
     for (const issue of parsed.error.issues) {
