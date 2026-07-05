@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { getTranslations } from "next-intl/server"
-import { ArrowLeftIcon, PlusIcon } from "lucide-react"
+import { ArrowLeftIcon, PlusIcon, TreePineIcon } from "lucide-react"
 
 import { getCurrentUser } from "@/lib/session"
 import { getFamily, getPeople } from "@/lib/people"
@@ -22,6 +22,7 @@ export default async function FamilyPeoplePage({
   if (!family) notFound()
 
   const t = await getTranslations("People")
+  const tTree = await getTranslations("Tree")
   const people = await getPeople(familyId)
 
   return (
@@ -44,12 +45,20 @@ export default async function FamilyPeoplePage({
               {t("count", { count: people.length })}
             </p>
           </div>
-          <Button asChild>
-            <Link href={`/families/${familyId}/people/new`}>
-              <PlusIcon />
-              {t("addPerson")}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href={`/families/${familyId}/tree`}>
+                <TreePineIcon />
+                {tTree("open")}
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href={`/families/${familyId}/people/new`}>
+                <PlusIcon />
+                {t("addPerson")}
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <PeopleDirectory people={people} />
