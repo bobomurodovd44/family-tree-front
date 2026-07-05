@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useTransition } from "react"
 import { useFormatter, useTranslations } from "next-intl"
 import { Loader2Icon, Trash2Icon, TreePineIcon } from "lucide-react"
@@ -30,13 +31,20 @@ export function FamilyCard({ family }: { family: Family }) {
   const [pending, startTransition] = useTransition()
 
   return (
-    <Card className="group relative gap-3">
+    <Card className="group relative gap-3 transition-colors hover:bg-muted/40">
+      {/* Full-card link into the family; action buttons below sit above it via z-10. */}
+      <Link
+        href={`/families/${family._id}`}
+        aria-label={family.name}
+        className="absolute inset-0 rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      />
+
       <div className="flex items-start justify-between gap-2">
         <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <TreePineIcon className="size-5" />
         </span>
 
-        <div className="flex items-center gap-0.5">
+        <div className="relative z-10 flex items-center gap-0.5">
           <FamilyDialog family={family} />
           <Tooltip>
             <TooltipTrigger asChild>
