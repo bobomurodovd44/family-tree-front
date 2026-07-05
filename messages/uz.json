@@ -6,7 +6,9 @@
     "hidePassword": "Parolni yashirish",
     "language": "Til",
     "localeUz": "O'zbekcha",
-    "localeRu": "Ruscha"
+    "localeRu": "Ruscha",
+    "darkMode": "Tungi rejim",
+    "lightMode": "Kunduzgi rejim"
   },
   "Auth": {
     "loginTitle": "Hisobga kirish",
@@ -39,5 +41,27 @@
   "Home": {
     "welcome": "Xush kelibsiz, {name}",
     "logout": "Chiqish"
+  },
+  "Families": {
+    "title": "Shajaralar",
+    "subtitle": "Oilangiz shajaralarini yarating, saqlang va ulashing.",
+    "create": "Yangi shajara",
+    "createTooltip": "Yangi oila shajarasini yaratish",
+    "createTitle": "Yangi shajara yaratish",
+    "createSubtitle": "Oila shajarangizga nom bering. Odamlarni keyinroq qo'shasiz.",
+    "nameLabel": "Shajara nomi",
+    "namePlaceholder": "Masalan, Karimovlar oilasi",
+    "createSubmit": "Yaratish",
+    "cancel": "Bekor qilish",
+    "emptyTitle": "Hali shajara yo'q",
+    "emptySubtitle": "Birinchi oila shajarangizni yarating va avlodlaringiz tarixini saqlashni boshlang.",
+    "delete": "O'chirish",
+    "deleteTitle": "Shajarani o'chirish",
+    "deleteConfirm": "\"{name}\" shajarasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+    "createdOn": "{date} da yaratilgan",
+    "errors": {
+      "nameMin": "Shajara nomi kamida 2 ta belgidan iborat bo'lishi kerak.",
+      "generic": "Xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring."
+    }
   }
 }
