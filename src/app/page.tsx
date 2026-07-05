@@ -5,7 +5,7 @@ import { TreePineIcon } from "lucide-react"
 import { getCurrentUser } from "@/lib/session"
 import { getFamilies } from "@/lib/families"
 import { AppHeader } from "@/components/app-header"
-import { CreateFamilyDialog } from "@/components/families/create-family-dialog"
+import { FamilyDialog } from "@/components/families/family-dialog"
 import { FamilyCard } from "@/components/families/family-card"
 
 export default async function Home() {
@@ -29,7 +29,7 @@ export default async function Home() {
             </h1>
             <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
           </div>
-          {families.length > 0 && <CreateFamilyDialog />}
+          {families.length > 0 && <FamilyDialog />}
         </div>
 
         {families.length === 0 ? (
@@ -43,7 +43,7 @@ export default async function Home() {
                 {t("emptySubtitle")}
               </p>
             </div>
-            <CreateFamilyDialog />
+            <FamilyDialog />
           </div>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

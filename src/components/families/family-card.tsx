@@ -6,6 +6,7 @@ import { Loader2Icon, Trash2Icon, TreePineIcon } from "lucide-react"
 
 import { deleteFamily } from "@/app/families/actions"
 import type { Family } from "@/lib/families"
+import { FamilyDialog } from "@/components/families/family-dialog"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -35,20 +36,23 @@ export function FamilyCard({ family }: { family: Family }) {
           <TreePineIcon className="size-5" />
         </span>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t("delete")}
-              onClick={() => setConfirmOpen(true)}
-              className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
-            >
-              <Trash2Icon />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t("delete")}</TooltipContent>
-        </Tooltip>
+        <div className="flex items-center gap-0.5">
+          <FamilyDialog family={family} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t("delete")}
+                onClick={() => setConfirmOpen(true)}
+                className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
+              >
+                <Trash2Icon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("delete")}</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
 
       <div className="flex flex-col gap-0.5">
