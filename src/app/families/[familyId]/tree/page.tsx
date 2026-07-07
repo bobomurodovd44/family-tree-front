@@ -5,13 +5,12 @@ import { ArrowLeftIcon } from "lucide-react"
 
 import { getCurrentUser } from "@/lib/session"
 import { getFamily } from "@/lib/people"
-import { demoPeople } from "@/components/family-tree/demo-data"
+import { getTree, treeToPeopleMap } from "@/lib/tree"
 import { FamilyCanvas } from "@/components/family-tree/FamilyCanvas"
 import { Button } from "@/components/ui/button"
 
-// Full-bleed interactive tree. Auth-gated like the rest of the app; the canvas currently runs on
-// demo data (the Neo4j relationships/tree services are the follow-up), so it's seeded with
-// demoPeople() rather than a live fetch. That single prop is the seam the backend drops into.
+// Full-bleed interactive tree. Auth-gated like the rest of the app; the canvas fetches real
+// people + relationships from the Neo4j tree service and seeds the canvas with them.
 export default async function FamilyTreePage({
   params,
 }: {
@@ -26,9 +25,12 @@ export default async function FamilyTreePage({
 
   const t = await getTranslations("Tree")
 
+  const rows = await getTree(familyId)
+  const initial = treeToPeopleMap(rows)
+
   return (
     <div className="relative h-svh w-full overflow-hidden">
-      <FamilyCanvas familyId={familyId} initial={demoPeople()} />
+      <FamilyCanvas familyId={familyId} initial={initial} />
 
       {/* back to the family */}
       <div className="pointer-events-none absolute top-4 left-4 z-40">

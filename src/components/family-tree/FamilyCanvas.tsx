@@ -245,7 +245,7 @@ export function FamilyCanvas({ familyId, initial }: FamilyCanvasProps) {
   }
 
   const handleFormSubmit = (patch: PersonPatch) => {
-    if (formId) tree.editPerson(formId, patch)
+    if (formId) tree.commitPerson(formId, patch)
   }
 
   // ── context-menu items ──
