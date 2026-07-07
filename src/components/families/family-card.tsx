@@ -67,7 +67,7 @@ export function FamilyCard({ family }: { family: Family }) {
         <h3 className="font-medium leading-tight tracking-tight">
           {family.name}
         </h3>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground" suppressHydrationWarning>
           {t("createdOn", {
             date: format.dateTime(new Date(family.createdAt), {
               dateStyle: "medium",

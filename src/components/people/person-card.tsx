@@ -14,13 +14,20 @@ export function PersonCard({ person }: { person: Person }) {
       href={`/families/${person.familyId}/people/${person._id}`}
       className="rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
     >
-      <Card className="group h-full flex-row items-center gap-3 p-4 transition-colors hover:bg-muted/50">
+      <Card 
+        className={`group h-full flex-row items-center gap-3 p-4 transition-colors hover:bg-muted/50 ${
+          !person.isLiving ? "grayscale opacity-75" : ""
+        }`}
+      >
         <PersonAvatar name={name} src={person.mainPhotoUrl} />
         <div className="flex min-w-0 flex-col gap-0.5">
           <h3 className="truncate font-medium leading-tight tracking-tight">
             {name}
             {person.nickname ? (
               <span className="text-muted-foreground"> “{person.nickname}”</span>
+            ) : null}
+            {!person.isLiving ? (
+              <span className="ml-2 text-xs text-muted-foreground">(Deceased)</span>
             ) : null}
           </h3>
           {years ? (
