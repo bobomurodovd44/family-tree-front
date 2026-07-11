@@ -42,6 +42,33 @@
     "welcome": "Xush kelibsiz, {name}",
     "logout": "Chiqish"
   },
+  "Nav": {
+    "overview": "Boshqaruv paneli",
+    "families": "Shajaralar",
+    "people": "Shaxslar"
+  },
+  "Dashboard": {
+    "welcome": "Xush kelibsiz, {name}",
+    "subtitle": "Oilangiz shajaralari va shaxslarining umumiy ko'rinishi.",
+    "families": "Shajaralar",
+    "people": "Shaxslar",
+    "living": "Tiriklar",
+    "deceased": "Vafot etganlar",
+    "recentFamilies": "So'nggi shajaralar",
+    "viewAll": "Barchasini ko'rish"
+  },
+  "Table": {
+    "person": "Shaxs",
+    "family": "Shajara",
+    "gender": "Jinsi",
+    "years": "Yillari",
+    "status": "Holati",
+    "name": "Nomi",
+    "people": "Shaxslar",
+    "created": "Yaratilgan",
+    "actions": "Amallar",
+    "view": "Ko'rish"
+  },
   "Families": {
     "title": "Shajaralar",
     "subtitle": "Oilangiz shajaralarini yarating, saqlang va ulashing.",

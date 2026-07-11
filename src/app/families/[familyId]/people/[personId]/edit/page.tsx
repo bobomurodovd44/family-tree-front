@@ -5,7 +5,6 @@ import { ArrowLeftIcon } from "lucide-react"
 
 import { getCurrentUser } from "@/lib/session"
 import { getPerson, personName } from "@/lib/people"
-import { AppHeader } from "@/components/app-header"
 import { PersonForm } from "@/components/people/person-form"
 
 export default async function EditPersonPage({
@@ -24,24 +23,20 @@ export default async function EditPersonPage({
   const name = personName(person)
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <AppHeader />
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 md:px-6 md:py-10">
+      <Link
+        href={`/families/${familyId}/people/${personId}`}
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeftIcon className="size-4" />
+        {name}
+      </Link>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 md:px-6 md:py-10">
-        <Link
-          href={`/families/${familyId}/people/${personId}`}
-          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
-          {name}
-        </Link>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight">
+        {t("editTitle")}
+      </h1>
 
-        <h1 className="mb-6 text-2xl font-semibold tracking-tight">
-          {t("editTitle")}
-        </h1>
-
-        <PersonForm familyId={familyId} person={person} />
-      </main>
+      <PersonForm familyId={familyId} person={person} />
     </div>
   )
 }

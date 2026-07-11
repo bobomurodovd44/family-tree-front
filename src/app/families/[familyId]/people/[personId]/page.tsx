@@ -7,7 +7,6 @@ import { ArrowLeftIcon, PencilIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getCurrentUser } from "@/lib/session"
 import { getPerson, lifeYears, personName } from "@/lib/people"
-import { AppHeader } from "@/components/app-header"
 import { PersonAvatar } from "@/components/people/person-avatar"
 import { DeletePersonButton } from "@/components/people/delete-person-button"
 import { Button } from "@/components/ui/button"
@@ -41,10 +40,7 @@ export default async function PersonProfilePage({
   ].filter((item) => item.value)
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <AppHeader />
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:px-6 md:py-10">
+    <div className="mx-auto w-full max-w-3xl px-4 py-8 md:px-6 md:py-10">
         <Link
           href={`/families/${familyId}`}
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -155,7 +151,6 @@ export default async function PersonProfilePage({
             </div>
           </section>
         )}
-      </main>
     </div>
   )
 }

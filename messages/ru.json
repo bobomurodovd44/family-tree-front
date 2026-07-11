@@ -42,6 +42,33 @@
     "welcome": "Добро пожаловать, {name}",
     "logout": "Выйти"
   },
+  "Nav": {
+    "overview": "Панель",
+    "families": "Семьи",
+    "people": "Люди"
+  },
+  "Dashboard": {
+    "welcome": "Добро пожаловать, {name}",
+    "subtitle": "Обзор ваших семейных древ и людей.",
+    "families": "Семьи",
+    "people": "Люди",
+    "living": "Живые",
+    "deceased": "Умершие",
+    "recentFamilies": "Недавние древа",
+    "viewAll": "Смотреть все"
+  },
+  "Table": {
+    "person": "Человек",
+    "family": "Древо",
+    "gender": "Пол",
+    "years": "Годы",
+    "status": "Статус",
+    "name": "Название",
+    "people": "Люди",
+    "created": "Создано",
+    "actions": "Действия",
+    "view": "Открыть"
+  },
   "Families": {
     "title": "Семейные древа",
     "subtitle": "Создавайте, храните и делитесь семейными древами.",

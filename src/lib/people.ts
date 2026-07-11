@@ -43,6 +43,22 @@ export async function getPeople(familyId: string): Promise<Person[]> {
   return ok && Array.isArray(data?.data) ? data.data : []
 }
 
+/**
+ * Every person across all families the caller owns, sorted by name. The backend `people`
+ * service scopes an un-filtered query to owned families (people.hooks.ts), so omitting
+ * `familyId` returns exactly the caller's people — what the global People dashboard needs.
+ */
+export async function getAllPeople(): Promise<Person[]> {
+  const token = await getToken()
+  if (!token) return []
+
+  const { ok, data } = await feathersFetch<Paginated<Person>>(
+    "/people?$sort[firstName]=1&$limit=1000",
+    { token }
+  )
+  return ok && Array.isArray(data?.data) ? data.data : []
+}
+
 /** A single person by id, or null (scoped to owned families server-side). */
 export async function getPerson(id: string): Promise<Person | null> {
   const token = await getToken()
