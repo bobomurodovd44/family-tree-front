@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react"
 import Link from "next/link"
-import { useFormatter, useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import {
   Loader2Icon,
   MoreHorizontalIcon,
@@ -18,6 +18,7 @@ import {
   type FamilyFormState,
 } from "@/app/families/actions"
 import type { Family } from "@/lib/families"
+import { formatShortDate } from "@/lib/format-date"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -57,7 +58,8 @@ export function FamiliesTable({
 }) {
   const t = useTranslations("Families")
   const tt = useTranslations("Table")
-  const format = useFormatter()
+  const tTree = useTranslations("Tree")
+  const locale = useLocale()
 
   const [renameTarget, setRenameTarget] = useState<Family | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Family | null>(null)
@@ -109,9 +111,7 @@ export function FamiliesTable({
                 className="hidden text-sm text-muted-foreground md:table-cell"
                 suppressHydrationWarning
               >
-                {format.dateTime(new Date(family.createdAt), {
-                  dateStyle: "medium",
-                })}
+                {formatShortDate(family.createdAt, locale)}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -135,7 +135,7 @@ export function FamiliesTable({
                     <DropdownMenuItem asChild>
                       <Link href={`/families/${family._id}/tree`}>
                         <TreePineIcon />
-                        {t("open")}
+                        {tTree("open")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem
