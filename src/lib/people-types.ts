@@ -30,6 +30,10 @@ export type Person = {
   privacy: Privacy
   mainPhotoKey?: string
   mainPhotoUrl?: string
+  // Photo archive: `photos` are durable S3 keys, `photoUrls` the presigned URLs the backend
+  // computes on read (same order). `mainPhotoKey` designates which one is the avatar.
+  photos?: string[]
+  photoUrls?: string[]
   createdBy: string
   createdAt: number
   updatedAt?: number

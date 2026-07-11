@@ -1,8 +1,10 @@
+import Image from "next/image"
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 import { ArrowLeftIcon, PencilIcon } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { getCurrentUser } from "@/lib/session"
 import { getPerson, lifeYears, personName } from "@/lib/people"
 import { AppHeader } from "@/components/app-header"
@@ -113,6 +115,44 @@ export default async function PersonProfilePage({
             <p className="text-sm leading-relaxed whitespace-pre-wrap">
               {person.bio}
             </p>
+          </section>
+        )}
+
+        {person.photoUrls && person.photoUrls.length > 0 && (
+          <section className="mt-8">
+            <h2 className="mb-3 text-sm font-medium tracking-wide text-muted-foreground uppercase">
+              {t("photos")}
+            </h2>
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+              {person.photoUrls.map((url, i) => {
+                const isMain = person.photos?.[i] === person.mainPhotoKey
+                return (
+                  <a
+                    key={url}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "relative aspect-[3/4] overflow-hidden rounded-lg border bg-muted",
+                      isMain && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                    )}
+                  >
+                    <Image
+                      src={url}
+                      alt=""
+                      fill
+                      sizes="(min-width: 640px) 25vw, 33vw"
+                      className="object-cover"
+                    />
+                    {isMain && (
+                      <span className="absolute top-1.5 left-1.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground shadow">
+                        {t("mainPhoto")}
+                      </span>
+                    )}
+                  </a>
+                )
+              })}
+            </div>
           </section>
         )}
       </main>

@@ -59,6 +59,9 @@ const IMAGE_TYPES = new Set([
   "image/avif",
 ])
 
+// Cap the gallery size (mirrors the backend schema's maxItems: 30, kept a little lower here).
+const MAX_PHOTOS = 20
+
 /** Upload an image File to the backend uploads service; returns the stored S3 key. */
 async function uploadPhoto(file: File, token: string): Promise<string | null> {
   if (!IMAGE_TYPES.has(file.type)) return null
@@ -131,15 +134,48 @@ export async function savePerson(
   }
   if (!personId) payload.familyId = familyId
 
-  // Photo: upload a new file, or clear on explicit removal.
-  const photo = formData.get("photo")
-  if (photo instanceof File && photo.size > 0) {
-    const key = await uploadPhoto(photo, token)
-    if (!key) return { error: t("errors.photoFailed") }
-    payload.mainPhotoKey = key
-  } else if (formData.get("removePhoto") === "true") {
-    payload.mainPhotoKey = ""
+  // Photo gallery. The form sends: `gallery` (ordered JSON of entries, each an existing S3 key
+  // or a pointer `{newIndex}` into the appended `newPhotos` files) and `mainIndex` (which
+  // position is the avatar). We upload the new files, then rebuild the ordered key list.
+  type GalleryEntry = { key?: string; newIndex?: number }
+  let gallery: GalleryEntry[] = []
+  try {
+    const raw = formData.get("gallery")
+    if (typeof raw === "string" && raw) gallery = JSON.parse(raw) as GalleryEntry[]
+  } catch {
+    gallery = []
   }
+
+  const newFiles = formData
+    .getAll("newPhotos")
+    .filter((f): f is File => f instanceof File && f.size > 0)
+
+  const uploadedKeys: string[] = []
+  for (const file of newFiles) {
+    const key = await uploadPhoto(file, token)
+    if (!key) return { error: t("errors.photoFailed") }
+    uploadedKeys.push(key)
+  }
+
+  const photos: string[] = []
+  for (const entry of gallery) {
+    if (typeof entry.key === "string") photos.push(entry.key)
+    else if (typeof entry.newIndex === "number" && uploadedKeys[entry.newIndex]) {
+      photos.push(uploadedKeys[entry.newIndex])
+    }
+  }
+  const trimmed = photos.slice(0, MAX_PHOTOS)
+
+  const mainIndex = Number(formData.get("mainIndex"))
+  const mainIdx =
+    Number.isInteger(mainIndex) && mainIndex >= 0 && mainIndex < trimmed.length
+      ? mainIndex
+      : trimmed.length > 0
+        ? 0
+        : -1
+
+  payload.photos = trimmed
+  payload.mainPhotoKey = mainIdx >= 0 ? trimmed[mainIdx] : ""
 
   const res = personId
     ? await feathersFetch<Person>(`/people/${personId}`, {
