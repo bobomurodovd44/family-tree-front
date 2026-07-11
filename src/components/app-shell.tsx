@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 import type { Theme } from "@/lib/theme"
-import { AppSidebar, type NavUser } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { UserMenu, type NavUser } from "@/components/user-menu"
 import {
   SidebarInset,
   SidebarProvider,
@@ -21,11 +22,11 @@ const BARE_ROUTES = [
 ]
 
 /**
- * The app shell. Wraps every page: authed pages get the sidebar + a slim top bar; auth
- * screens, the tree canvas, and any not-yet-authenticated view render bare. `user` is null
- * when there's no session, in which case we also render bare (the page itself redirects to
- * /login). Keeping this in one client component lets the sidebar's open/collapsed state
- * persist across navigations (the layout above it never re-renders).
+ * The app shell. Wraps every page: authed pages get the sidebar + a top bar (with the
+ * language / theme / account controls on the right); auth screens, the tree canvas, and any
+ * not-yet-authenticated view render bare. `user` is null when there's no session, in which
+ * case we also render bare (the page itself redirects to /login). Keeping this in one client
+ * component lets the sidebar's open/collapsed state persist across navigations.
  */
 export function AppShell({
   user,
@@ -46,13 +47,16 @@ export function AppShell({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar user={user} theme={theme} />
+      <AppSidebar />
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur">
           <SidebarTrigger />
           <span className="font-heading text-sm font-medium md:hidden">
             {t("appName")}
           </span>
+          <div className="ml-auto flex items-center">
+            <UserMenu user={user} theme={theme} />
+          </div>
         </header>
         {children}
       </SidebarInset>
