@@ -34,11 +34,13 @@ const PartialDate = z.preprocess(
 
 const PersonSchema = z.object({
   firstName: z.string().trim().min(1, "firstNameRequired").max(120),
+  middleName: optionalText(120),
   lastName: optionalText(120),
   nickname: optionalText(120),
   gender: z.enum(["male", "female"]),
   birthDate: PartialDate,
   deathDate: PartialDate,
+  maritalStatus: z.enum(["single", "married", "divorced", "widowed"]).optional(),
   birthPlace: optionalText(200),
   deathPlace: optionalText(200),
   profession: optionalText(200),
@@ -91,9 +93,11 @@ export async function savePerson(
 
   const parsed = PersonSchema.safeParse({
     firstName: formData.get("firstName"),
+    middleName: formData.get("middleName"),
     lastName: formData.get("lastName"),
     nickname: formData.get("nickname"),
     gender: formData.get("gender"),
+    maritalStatus: formData.get("maritalStatus") || undefined,
     birthDate: formData.get("birthDate"),
     deathDate: formData.get("deathDate"),
     birthPlace: formData.get("birthPlace"),

@@ -24,10 +24,12 @@ export interface SpouseLink {
 export interface TreePerson {
   id: string
   firstName: string
+  middleName?: string
   lastName?: string
   /** Presigned photo URL when we have one; cards fall back to initials otherwise. */
   avatar?: string
   gender: Gender
+  maritalStatus?: SpouseStatus | "single"
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
@@ -60,19 +62,19 @@ export function lifeYears(p: Pick<TreePerson, "birthYear" | "deathYear">): strin
 }
 
 /** Relationship badge for a spouse, from their gender + the marriage status. */
-export function spouseLabel(spouseGender: Gender, status: SpouseStatus): string {
+export function spouseLabel(spouseGender: Gender, status: SpouseStatus, t: (key: string) => string): string {
   const female = spouseGender === "female"
-  if (status === "divorced") return female ? "EX-WIFE" : "EX-HUSBAND"
-  if (status === "widowed") return female ? "WIDOW" : "WIDOWER"
-  return female ? "WIFE" : "HUSBAND"
+  if (status === "divorced") return female ? t("exWife") : t("exHusband")
+  if (status === "widowed") return female ? t("widow") : t("widower")
+  return female ? t("wife") : t("husband")
 }
 
-export function childLabel(childGender: Gender): string {
-  return childGender === "female" ? "DAUGHTER" : "SON"
+export function childLabel(childGender: Gender, t: (key: string) => string): string {
+  return childGender === "female" ? t("daughter") : t("son")
 }
 
-export function parentLabel(parentGender: Gender): string {
-  return parentGender === "female" ? "MOTHER" : "FATHER"
+export function parentLabel(parentGender: Gender, t: (key: string) => string): string {
+  return parentGender === "female" ? t("mother") : t("father")
 }
 
 // ── Derivation & normalization ──────────────────────────────────────────────────────────────
@@ -124,7 +126,8 @@ export function deriveEdges(people: PeopleMap): {
 export function relationLabel(
   people: PeopleMap,
   selectedId: string,
-  personId: string
+  personId: string,
+  t: (key: string) => string
 ): string | null {
   if (selectedId === personId) return null
   const sel = people[selectedId]
@@ -132,12 +135,12 @@ export function relationLabel(
   if (!sel || !person) return null
 
   const spouse = sel.spouses.find((s) => s.id === personId)
-  if (spouse) return spouseLabel(person.gender, spouse.status)
-  if (sel.children.includes(personId)) return childLabel(person.gender)
-  if (sel.parents.includes(personId)) return parentLabel(person.gender)
+  if (spouse) return spouseLabel(person.gender, spouse.status, t)
+  if (sel.children.includes(personId)) return childLabel(person.gender, t)
+  if (sel.parents.includes(personId)) return parentLabel(person.gender, t)
 
   const parentSet = new Set(sel.parents)
-  if (sel.parents.length > 0 && person.parents.some((pid) => parentSet.has(pid))) return "SIBLING"
+  if (sel.parents.length > 0 && person.parents.some((pid) => parentSet.has(pid))) return t("sibling")
   return null
 }
 

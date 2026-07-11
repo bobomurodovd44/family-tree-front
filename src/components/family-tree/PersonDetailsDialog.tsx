@@ -5,7 +5,7 @@
 // a current wife into an ex-wife (or a widow) — the requested "make a wife an ex-wife" flow.
 
 import { useTranslations } from "next-intl"
-import { PencilIcon } from "lucide-react"
+import { PencilIcon, XIcon } from "lucide-react"
 
 import {
   lifeYears,
@@ -18,13 +18,20 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Select } from "@/components/ui/select"
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select"
 import { PersonAvatar } from "@/components/people/person-avatar"
 
 export interface PersonDetailsDialogProps {
@@ -80,30 +87,53 @@ export function PersonDetailsDialog({
   const deceased = person.isLiving === false || person.deathYear != null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <div className="flex items-start gap-3">
-            <PersonAvatar name={name} src={person.avatar} className="size-14" sizes="56px" />
-            <div className="flex flex-1 flex-col gap-1">
-              <DialogTitle className="flex items-center gap-2">
-                {name}
-                <Badge variant={deceased ? "muted" : "default"}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent 
+        className="w-full sm:w-[600px] sm:max-w-none overflow-y-auto p-0 [&>button]:hidden"
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
+        <div className="px-4 sm:px-6 pt-6">
+          <SheetHeader className="mb-6">
+            <div className="flex items-start gap-3">
+              <SheetClose asChild>
+                <Button type="button" variant="ghost" size="icon" className="shrink-0 -ml-2">
+                  <XIcon className="size-5" />
+                </Button>
+              </SheetClose>
+              <PersonAvatar name={name} src={person.avatar} className="size-14 shrink-0" sizes="56px" />
+            <div className="flex flex-1 flex-col gap-1 text-left min-w-0">
+              <SheetTitle className="flex items-center gap-2 text-lg">
+                <span className="truncate">{name}</span>
+                <Badge variant={deceased ? "muted" : "default"} className="shrink-0">
                   {deceased ? t("deceased") : t("living")}
                 </Badge>
-              </DialogTitle>
-              <DialogDescription className="tabular-nums">
+              </SheetTitle>
+              <SheetDescription className="tabular-nums">
                 {years || t("details")}
-              </DialogDescription>
+              </SheetDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={onEdit}>
+            <Button variant="outline" size="sm" onClick={onEdit} className="shrink-0 hidden sm:flex">
               <PencilIcon />
               {t("edit")}
             </Button>
+            <Button variant="outline" size="icon" onClick={onEdit} className="shrink-0 sm:hidden">
+              <PencilIcon className="size-4" />
+            </Button>
           </div>
-        </DialogHeader>
+        </SheetHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6 pb-8">
+          <Section label={t("maritalStatus", { fallback: "Marital Status" })}>
+            <span className="text-sm">
+              {person.maritalStatus === "single" && t("statusSingle", { fallback: "Single" })}
+              {person.maritalStatus === "married" && t("statusMarried")}
+              {person.maritalStatus === "divorced" && t("statusDivorced")}
+              {person.maritalStatus === "widowed" && t("statusWidowed")}
+              {!person.maritalStatus && t("none")}
+            </span>
+          </Section>
+
           <Section label={t("parents")}>
             {parents.length ? (
               parents.map((p) => (
@@ -127,15 +157,18 @@ export function PersonDetailsDialog({
                     <PersonChip person={sp} onClick={() => onFocusPerson(sp.id)} />
                     <Select
                       value={link.status}
-                      onChange={(e) =>
-                        onSetSpouseStatus(sp.id, e.target.value as SpouseStatus)
+                      onValueChange={(val) =>
+                        onSetSpouseStatus(sp.id, val as SpouseStatus)
                       }
-                      className="h-7 w-auto text-xs"
-                      aria-label={t("relationshipStatus")}
                     >
-                      <option value="married">{t("statusMarried")}</option>
-                      <option value="divorced">{t("statusDivorced")}</option>
-                      <option value="widowed">{t("statusWidowed")}</option>
+                      <SelectTrigger className="h-7 w-[110px] text-xs">
+                        <SelectValue aria-label={t("relationshipStatus")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="married">{t("statusMarried")}</SelectItem>
+                        <SelectItem value="divorced">{t("statusDivorced")}</SelectItem>
+                        <SelectItem value="widowed">{t("statusWidowed")}</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                 )
@@ -165,7 +198,8 @@ export function PersonDetailsDialog({
             )}
           </Section>
         </div>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

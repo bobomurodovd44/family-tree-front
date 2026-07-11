@@ -16,11 +16,14 @@ import type { Gender, SpouseStatus } from "@/lib/tree-types"
 // map onto the people schema's partial-date strings ("YYYY").
 export interface TreePersonInput {
   firstName: string
+  middleName?: string
   lastName?: string
   gender: Gender
+  maritalStatus?: SpouseStatus | "single"
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
+  mainPhotoKey?: string
 }
 
 // Build the /people payload from the canvas's year-based input.
@@ -30,9 +33,12 @@ function personPayload(input: TreePersonInput): Record<string, unknown> {
     gender: input.gender,
   }
   if (input.lastName) payload.lastName = input.lastName
+  if (input.middleName) payload.middleName = input.middleName
+  if (input.maritalStatus) payload.maritalStatus = input.maritalStatus
   if (input.birthYear != null) payload.birthDate = String(input.birthYear)
   if (input.deathYear != null) payload.deathDate = String(input.deathYear)
   if (input.isLiving != null) payload.isLiving = input.isLiving
+  if (input.mainPhotoKey !== undefined) payload.mainPhotoKey = input.mainPhotoKey // allow empty string to clear
   return payload
 }
 
@@ -193,4 +199,20 @@ export async function deleteTreePerson(_familyId: string, id: string): Promise<v
   const token = await getToken()
   if (!token) return
   await feathersFetch(`/people/${id}`, { method: "DELETE", token })
+}
+
+/** Upload a cropped photo as a base64 string from the Tree canvas to S3 */
+export async function uploadTreePhotoAction(
+  base64: string,
+  contentType: string,
+  filename: string
+): Promise<string | null> {
+  const token = await getToken()
+  if (!token) return null
+  const { ok, data } = await feathersFetch<{ key: string }>("/uploads", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ file: base64, contentType, filename }),
+  })
+  return ok ? (data?.key ?? null) : null
 }

@@ -35,6 +35,7 @@ import {
   moveTreePerson,
   patchTreePerson,
   setSpouseStatusAction,
+  uploadTreePhotoAction,
   type TreePersonInput,
 } from "@/app/families/[familyId]/tree/actions"
 
@@ -49,12 +50,15 @@ function placeholder(gender: Gender, x: number, y: number): TreePerson {
 
 export interface PersonPatch {
   firstName?: string
+  middleName?: string
   lastName?: string
   gender?: Gender
+  maritalStatus?: SpouseStatus | "single"
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
   avatar?: string
+  photoData?: { base64: string; contentType: string; filename: string } | { remove: true }
 }
 
 // What still-unsaved placeholder to create on commit, and how to link it.
@@ -85,8 +89,10 @@ export interface FamilyTree {
 function toInput(patch: PersonPatch, node?: TreePerson): TreePersonInput {
   return {
     firstName: (patch.firstName ?? node?.firstName ?? "").trim(),
+    middleName: patch.middleName ?? node?.middleName,
     lastName: patch.lastName ?? node?.lastName,
     gender: patch.gender ?? node?.gender ?? "male",
+    maritalStatus: patch.maritalStatus ?? node?.maritalStatus ?? "single",
     birthYear: patch.birthYear,
     deathYear: patch.deathYear,
     isLiving: patch.isLiving,
@@ -258,15 +264,30 @@ export function useFamilyTree(familyId: string, initial: PeopleMap): FamilyTree 
         if (p) draft[id] = { ...p, ...patch }
       })
 
-      if (!pending) {
-        void patchTreePerson(familyId, id, toInput(patch, peopleRef.current[id]))
-        return
-      }
-
       committingRef.current.add(id) // guard against a concurrent cancel from the dialog close
       void (async () => {
         const node = peopleRef.current[id]
         const input = toInput(patch, node)
+
+        if (patch.photoData) {
+          if ("remove" in patch.photoData && patch.photoData.remove) {
+            input.mainPhotoKey = ""
+          } else if ("base64" in patch.photoData) {
+            const key = await uploadTreePhotoAction(
+              patch.photoData.base64,
+              patch.photoData.contentType,
+              patch.photoData.filename
+            )
+            if (key) input.mainPhotoKey = key
+          }
+        }
+
+        if (!pending) {
+          await patchTreePerson(familyId, id, input)
+          committingRef.current.delete(id)
+          return
+        }
+
         const x = node?.x ?? 0
         const y = node?.y ?? 0
         let realId: string | null = null

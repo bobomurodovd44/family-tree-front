@@ -87,9 +87,9 @@ export function FamilyCanvas({ familyId, initial }: FamilyCanvasProps) {
   // on pan/zoom), so cards stay memo-stable while panning.
   const relationLabels = useMemo(() => {
     const map: Record<string, string | null> = {}
-    if (selectedId) for (const p of peopleList) map[p.id] = relationLabel(people, selectedId, p.id)
+    if (selectedId) for (const p of peopleList) map[p.id] = relationLabel(people, selectedId, p.id, t)
     return map
-  }, [people, peopleList, selectedId])
+  }, [people, peopleList, selectedId, t])
 
   // ── measure container + initial fit ──
   useEffect(() => {

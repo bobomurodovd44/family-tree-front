@@ -4,6 +4,7 @@
 
 export type Gender = "male" | "female"
 export type Privacy = "public" | "family" | "private"
+export type MaritalStatus = "single" | "married" | "divorced" | "widowed"
 
 // Mirrors the backend Person (people.schema.ts). `mainPhotoKey` is the stored S3 key;
 // `mainPhotoUrl` is a presigned, ready-to-render URL the backend computes on read.
@@ -11,11 +12,13 @@ export type Person = {
   _id: string
   familyId: string
   firstName: string
+  middleName?: string
   lastName?: string
   nickname?: string
   gender: Gender
   birthDate?: string
   deathDate?: string
+  maritalStatus?: MaritalStatus
   birthPlace?: string
   deathPlace?: string
   isLiving: boolean
@@ -33,8 +36,8 @@ export type Person = {
 }
 
 /** Full display name, folding in an optional nickname. */
-export function personName(person: Pick<Person, "firstName" | "lastName">): string {
-  return [person.firstName, person.lastName].filter(Boolean).join(" ")
+export function personName(person: Pick<Person, "firstName" | "middleName" | "lastName">): string {
+  return [person.firstName, person.middleName, person.lastName].filter(Boolean).join(" ")
 }
 
 /** "1950 – 2001" | "b. 1950" | "" — the year label under a person's name. */
