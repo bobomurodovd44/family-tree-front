@@ -33,6 +33,10 @@ export interface TreePerson {
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
+  /** Biography (tarjimai hol). NOT loaded by the tree read service (kept off the graph node); it's
+   * lazy-loaded into the edit form and set here after a local edit, so the narration cache key
+   * reflects bio changes. Undefined for freshly-loaded people. */
+  bio?: string
   /** World-space coordinates (top-left of the card). Positions are data, never hard-coded. */
   x: number
   y: number
@@ -83,7 +87,7 @@ export function parentLabel(parentGender: Gender, t: (key: string) => string): s
  * authoritative gate and also covers off-card fields like birthplace/profession across reloads).
  */
 export function narrationSignature(
-  p: Pick<TreePerson, "firstName" | "middleName" | "lastName" | "birthYear" | "deathYear" | "isLiving">
+  p: Pick<TreePerson, "firstName" | "middleName" | "lastName" | "birthYear" | "deathYear" | "isLiving" | "bio">
 ): string {
   return [
     p.firstName ?? "",
@@ -92,6 +96,7 @@ export function narrationSignature(
     p.birthYear ?? "",
     p.deathYear ?? "",
     p.isLiving ?? "",
+    p.bio ?? "",
   ].join("|")
 }
 

@@ -57,6 +57,7 @@ export interface PersonPatch {
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
+  bio?: string
   avatar?: string
   photoData?: { base64: string; contentType: string; filename: string } | { remove: true }
 }
@@ -96,6 +97,9 @@ function toInput(patch: PersonPatch, node?: TreePerson): TreePersonInput {
     birthYear: patch.birthYear,
     deathYear: patch.deathYear,
     isLiving: patch.isLiving,
+    // bio is loaded into the form from Mongo and submitted back verbatim (the tree node has none),
+    // so read it straight from the patch — undefined leaves it unchanged on the server.
+    bio: patch.bio,
   }
 }
 

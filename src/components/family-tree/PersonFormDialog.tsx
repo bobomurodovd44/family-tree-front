@@ -23,12 +23,11 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetFooter,
-  SheetHeader,
   SheetTitle
 } from "@/components/ui/sheet"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -37,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ImageCropper } from "@/components/people/image-cropper"
+import { getPersonBioAction } from "@/app/families/[familyId]/tree/actions"
 
 /* ── Gender toggle (pill with icons) ─────────────────────────────────────── */
 
@@ -263,14 +263,16 @@ function blobToBase64(blob: Blob): Promise<string> {
 
 function PersonForm({
   person,
+  initialBio,
   onSubmit,
 }: {
   person: TreePerson
+  initialBio: string
   onSubmit: (patch: PersonPatch) => void
 }) {
   const tTree = useTranslations("Tree")
   const tPeople = useTranslations("People")
-  
+
   const [firstName, setFirstName] = useState(person.firstName ?? "")
   const [middleName, setMiddleName] = useState(person.middleName ?? "")
   const [lastName, setLastName] = useState(person.lastName ?? "")
@@ -279,6 +281,7 @@ function PersonForm({
   const [birthYear, setBirthYear] = useState(person.birthYear ? String(person.birthYear) : "")
   const [deathYear, setDeathYear] = useState(person.deathYear ? String(person.deathYear) : "")
   const [isLiving, setIsLiving] = useState(person.isLiving !== false && !person.deathYear)
+  const [bio, setBio] = useState(initialBio)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Photo Cropper State
@@ -351,6 +354,9 @@ function PersonForm({
       birthYear: Number.isFinite(by) ? by : undefined,
       deathYear: !isLiving && Number.isFinite(dy) ? dy : undefined,
       isLiving,
+      // Only send bio when it actually changed from what we loaded — so a failed bio fetch (empty
+      // field) can never silently wipe an existing tarjimai hol, and unchanged bios aren't resent.
+      bio: bio.trim() !== initialBio.trim() ? bio.trim() : undefined,
       photoData,
       ...(avatar !== undefined && { avatar })
     })
@@ -358,7 +364,7 @@ function PersonForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 pb-8 px-4 sm:px-6 relative">
+      <form onSubmit={handleSubmit} className="relative mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-8 sm:px-6">
         <div className="sticky top-0 z-10 flex flex-row items-center justify-between bg-popover/95 backdrop-blur pt-4 pb-3 border-b -mx-4 px-4 sm:-mx-6 sm:px-6 mb-2">
           <div className="flex flex-row items-center gap-3">
             <SheetClose asChild>
@@ -520,6 +526,17 @@ function PersonForm({
           </AnimatePresence>
         </div>
 
+        {/* biography (tarjimai hol) — read aloud by the Listen narration when present */}
+        <Field>
+          <FieldLabel htmlFor="tf-bio">{tPeople("bio")}</FieldLabel>
+          <Textarea
+            id="tf-bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={6}
+          />
+        </Field>
+
       </form>
 
       {/* Cropper Dialog */}
@@ -544,16 +561,53 @@ function PersonForm({
   )
 }
 
+// Loads the person's biography (not carried on the tree node) before rendering the form, so the
+// bio field is populated and re-editing never blanks an existing tarjimai hol. New placeholder
+// cards (temp ids) skip the fetch and start with an empty bio.
+function PersonFormLoader({
+  person,
+  onSubmit,
+}: {
+  person: TreePerson
+  onSubmit: (patch: PersonPatch) => void
+}) {
+  const t = useTranslations("Tree")
+  const isReal = /^[a-f0-9]{24}$/i.test(person.id)
+  const [bio, setBio] = useState<string | null>(isReal ? null : "") // null = still loading
+
+  useEffect(() => {
+    if (!isReal) return
+    let alive = true
+    getPersonBioAction(person.id).then((value) => {
+      if (alive) setBio(value ?? "")
+    })
+    return () => {
+      alive = false
+    }
+  }, [isReal, person.id])
+
+  if (bio === null) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <SheetTitle className="sr-only">{t("editTitle")}</SheetTitle>
+        <Loader2Icon className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  return <PersonForm person={person} initialBio={bio} onSubmit={onSubmit} />
+}
+
 export function PersonFormDialog({ open, person, onOpenChange, onSubmit }: PersonFormDialogProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        className="w-full sm:w-[600px] sm:max-w-none overflow-y-auto p-0 [&>button]:hidden"
+      <SheetContent
+        className="w-full sm:max-w-none overflow-y-auto p-0 [&>button]:hidden"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {person && (
-          <PersonForm
+          <PersonFormLoader
             key={person.id}
             person={person}
             onSubmit={(patch) => {

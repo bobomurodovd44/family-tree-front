@@ -23,6 +23,7 @@ export interface TreePersonInput {
   birthYear?: number
   deathYear?: number
   isLiving?: boolean
+  bio?: string
   mainPhotoKey?: string
 }
 
@@ -38,6 +39,7 @@ function personPayload(input: TreePersonInput): Record<string, unknown> {
   if (input.birthYear != null) payload.birthDate = String(input.birthYear)
   if (input.deathYear != null) payload.deathDate = String(input.deathYear)
   if (input.isLiving != null) payload.isLiving = input.isLiving
+  if (input.bio !== undefined) payload.bio = input.bio // allow empty string to clear
   if (input.mainPhotoKey !== undefined) payload.mainPhotoKey = input.mainPhotoKey // allow empty string to clear
   return payload
 }
@@ -199,6 +201,18 @@ export async function deleteTreePerson(_familyId: string, id: string): Promise<v
   const token = await getToken()
   if (!token) return
   await feathersFetch(`/people/${id}`, { method: "DELETE", token })
+}
+
+/**
+ * Fetch a person's biography (tarjimai hol) for the edit form. The tree canvas loads people from
+ * the Neo4j `tree` service, which doesn't carry `bio`, so the form lazy-loads it from Mongo when
+ * opened. Returns the bio ("" when none), or null if the fetch failed.
+ */
+export async function getPersonBioAction(personId: string): Promise<string | null> {
+  const token = await getToken()
+  if (!token) return null
+  const { ok, data } = await feathersFetch<{ bio?: string }>(`/people/${personId}`, { token })
+  return ok ? (data?.bio ?? "") : null
 }
 
 /**
