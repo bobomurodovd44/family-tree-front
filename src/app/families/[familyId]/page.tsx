@@ -4,14 +4,19 @@ import { getTranslations } from "next-intl/server"
 import { PlusIcon, TreePineIcon } from "lucide-react"
 
 import { getCurrentUser } from "@/lib/session"
-import { getFamily, getPeople } from "@/lib/people"
+import { getFamily, getPeoplePage } from "@/lib/people"
+import { firstParam, parsePage } from "@/lib/pagination"
 import { PeopleTable } from "@/components/people/people-table"
+import { PeopleSearch } from "@/components/people/people-search"
+import { Pagination } from "@/components/pagination"
 import { Button } from "@/components/ui/button"
 
 export default async function FamilyPeoplePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ familyId: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
@@ -22,7 +27,18 @@ export default async function FamilyPeoplePage({
 
   const t = await getTranslations("People")
   const tTree = await getTranslations("Tree")
-  const people = await getPeople(familyId)
+  const sp = await searchParams
+  const page = parsePage(sp.page)
+  const q = firstParam(sp.q)
+
+  // Only this page of the family's people is fetched; search is scoped to this family server-side.
+  const { items: people, page: current, pageCount, total } = await getPeoplePage({
+    familyId,
+    page,
+    q,
+  })
+
+  const showSearch = total > 0 || Boolean(q)
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 md:py-10">
@@ -30,7 +46,7 @@ export default async function FamilyPeoplePage({
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight">{family.name}</h1>
           <p className="text-sm text-muted-foreground">
-            {t("count", { count: people.length })}
+            {t("count", { count: total })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -49,8 +65,10 @@ export default async function FamilyPeoplePage({
         </div>
       </div>
 
-      <div className="mt-6">
-        <PeopleTable people={people} />
+      <div className="mt-6 flex flex-col gap-4">
+        {showSearch && <PeopleSearch initialQuery={q} />}
+        <PeopleTable people={people} query={q} />
+        <Pagination page={current} pageCount={pageCount} keep={{ q: q || undefined }} />
       </div>
     </div>
   )

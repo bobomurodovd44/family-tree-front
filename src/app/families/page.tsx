@@ -3,23 +3,29 @@ import { getTranslations } from "next-intl/server"
 import { TreePineIcon } from "lucide-react"
 
 import { getCurrentUser } from "@/lib/session"
-import { getFamilies } from "@/lib/families"
-import { getAllPeople } from "@/lib/people"
+import { getFamiliesPage } from "@/lib/families"
+import { getPeopleCounts } from "@/lib/people"
+import { parsePage } from "@/lib/pagination"
 import { FamiliesTable } from "@/components/families/families-table"
 import { FamilyDialog } from "@/components/families/family-dialog"
+import { Pagination } from "@/components/pagination"
 
-export default async function FamiliesPage() {
+export default async function FamiliesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
 
   const t = await getTranslations("Families")
-  const [families, people] = await Promise.all([getFamilies(), getAllPeople()])
+  const { page: pageParam } = await searchParams
+  const page = parsePage(pageParam)
 
-  // People-per-family counts for the table's "People" column.
-  const counts: Record<string, number> = {}
-  for (const person of people) {
-    counts[person.familyId] = (counts[person.familyId] ?? 0) + 1
-  }
+  // Only the current page of families is fetched; people counts for those families come from
+  // cheap count-only queries (no full people load).
+  const { items: families, page: current, pageCount, total } = await getFamiliesPage({ page })
+  const counts = await getPeopleCounts(families.map((family) => family._id))
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 md:py-10">
@@ -28,10 +34,10 @@ export default async function FamiliesPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
-        {families.length > 0 && <FamilyDialog />}
+        {total > 0 && <FamilyDialog />}
       </div>
 
-      {families.length === 0 ? (
+      {total === 0 ? (
         <div className="mt-10 flex flex-col items-center justify-center gap-5 rounded-2xl border border-dashed px-6 py-16 text-center">
           <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <TreePineIcon className="size-7" />
@@ -45,8 +51,9 @@ export default async function FamiliesPage() {
           <FamilyDialog />
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col gap-4">
           <FamiliesTable families={families} counts={counts} />
+          <Pagination page={current} pageCount={pageCount} />
         </div>
       )}
     </div>

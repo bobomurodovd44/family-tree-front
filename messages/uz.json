@@ -70,6 +70,12 @@
     "actions": "Amallar",
     "view": "Ko'rish"
   },
+  "Pagination": {
+    "label": "Sahifalar bo'yicha o'tish",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "page": "Sahifa {page} / {pageCount}"
+  },
   "Families": {
     "title": "Shajaralar",
     "subtitle": "Oilangiz shajaralarini yarating, saqlang va ulashing.",
@@ -107,6 +113,7 @@
     "emptyTitle": "Hali shaxslar yo'q",
     "emptySubtitle": "Ushbu shajaraga birinchi shaxsni qo'shib, oila tarixini yozishni boshlang.",
     "searchPlaceholder": "Ism, yil yoki joy bo'yicha qidirish",
+    "noMatchesTitle": "Hech kim topilmadi",
     "noMatches": "\"{query}\" bo'yicha hech kim topilmadi.",
     "firstName": "Ism",
     "middleName": "Otasining ismi",

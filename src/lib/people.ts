@@ -4,6 +4,7 @@ import { feathersFetch } from "@/lib/api"
 import { getToken } from "@/lib/session"
 import type { Family } from "@/lib/families"
 import type { Person } from "@/lib/people-types"
+import { PAGE_SIZE, toPage, type Page } from "@/lib/pagination"
 
 // Re-export the client-safe types + helpers so server callers can keep importing from
 // "@/lib/people". Client components must import these from "@/lib/people-types" directly to
@@ -41,6 +42,62 @@ export async function getPeople(familyId: string): Promise<Person[]> {
     { token }
   )
   return ok && Array.isArray(data?.data) ? data.data : []
+}
+
+/**
+ * One page of people (15 per page), sorted by name. Fetches only the requested page from the
+ * backend rather than the whole collection.
+ *  - `familyId` scopes to a single family (the family detail page); omit it for the global list.
+ *  - `q` runs a server-side free-text search (name / nickname / place) across the whole set,
+ *    and the matches are themselves paginated (see people.hooks.ts `searchPeople`).
+ */
+export async function getPeoplePage({
+  page = 1,
+  familyId,
+  q,
+  pageSize = PAGE_SIZE,
+}: {
+  page?: number
+  familyId?: string
+  q?: string
+  pageSize?: number
+} = {}): Promise<Page<Person>> {
+  const token = await getToken()
+  if (!token) return toPage<Person>([], 0, page, pageSize)
+
+  const params = new URLSearchParams()
+  params.set("$sort[firstName]", "1")
+  params.set("$limit", String(pageSize))
+  params.set("$skip", String((page - 1) * pageSize))
+  if (familyId) params.set("familyId", familyId)
+  if (q?.trim()) params.set("q", q.trim())
+
+  const { ok, data } = await feathersFetch<Paginated<Person>>(`/people?${params}`, { token })
+  if (!ok || !Array.isArray(data?.data)) return toPage<Person>([], 0, page, pageSize)
+
+  return toPage(data.data, data.total ?? data.data.length, page, pageSize)
+}
+
+/**
+ * People counts per family, computed with cheap count-only queries (`$limit=0` returns the
+ * total without any documents). Used for the "People" column on the paginated families table
+ * without loading every person.
+ */
+export async function getPeopleCounts(familyIds: string[]): Promise<Record<string, number>> {
+  const token = await getToken()
+  const ids = Array.from(new Set(familyIds))
+  if (!token || ids.length === 0) return {}
+
+  const entries = await Promise.all(
+    ids.map(async (familyId) => {
+      const { ok, data } = await feathersFetch<Paginated<Person>>(
+        `/people?familyId=${familyId}&$limit=0`,
+        { token }
+      )
+      return [familyId, ok ? (data?.total ?? 0) : 0] as const
+    })
+  )
+  return Object.fromEntries(entries)
 }
 
 /**

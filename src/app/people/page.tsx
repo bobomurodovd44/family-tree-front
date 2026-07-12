@@ -2,23 +2,33 @@ import { redirect } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 
 import { getCurrentUser } from "@/lib/session"
-import { getFamilies } from "@/lib/families"
-import { getAllPeople } from "@/lib/people"
+import { getFamiliesByIds } from "@/lib/families"
+import { getPeoplePage } from "@/lib/people"
+import { firstParam, parsePage } from "@/lib/pagination"
 import { PeopleTable } from "@/components/people/people-table"
+import { PeopleSearch } from "@/components/people/people-search"
+import { Pagination } from "@/components/pagination"
 
-export default async function PeoplePage() {
+export default async function PeoplePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
 
   const t = await getTranslations("People")
   const tNav = await getTranslations("Nav")
-  const [people, families] = await Promise.all([getAllPeople(), getFamilies()])
+  const sp = await searchParams
+  const page = parsePage(sp.page)
+  const q = firstParam(sp.q)
 
-  // Map familyId → name so the table can show which tree each person belongs to.
-  const familyNames: Record<string, string> = {}
-  for (const family of families) {
-    familyNames[family._id] = family.name
-  }
+  // Server-side: only this page of matches is fetched (search runs across all people).
+  const { items: people, page: current, pageCount, total } = await getPeoplePage({ page, q })
+  // Names for just the families referenced on this page — no full families load.
+  const familyNames = await getFamiliesByIds(people.map((person) => person.familyId))
+
+  const showSearch = total > 0 || Boolean(q)
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 md:px-6 md:py-10">
@@ -27,11 +37,15 @@ export default async function PeoplePage() {
           {tNav("people")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {t("count", { count: people.length })}
+          {t("count", { count: total })}
         </p>
       </div>
 
-      <PeopleTable people={people} familyNames={familyNames} />
+      <div className="flex flex-col gap-4">
+        {showSearch && <PeopleSearch initialQuery={q} />}
+        <PeopleTable people={people} familyNames={familyNames} query={q} />
+        <Pagination page={current} pageCount={pageCount} keep={{ q: q || undefined }} />
+      </div>
     </div>
   )
 }
