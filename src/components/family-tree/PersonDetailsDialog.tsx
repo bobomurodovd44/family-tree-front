@@ -9,6 +9,7 @@ import { PencilIcon, XIcon } from "lucide-react"
 
 import {
   lifeYears,
+  narrationSignature,
   personName,
   siblingsOf,
   type PeopleMap,
@@ -33,6 +34,7 @@ import {
   SelectValue 
 } from "@/components/ui/select"
 import { PersonAvatar } from "@/components/people/person-avatar"
+import { ListenButton } from "@/components/family-tree/ListenButton"
 
 export interface PersonDetailsDialogProps {
   open: boolean
@@ -124,6 +126,14 @@ export function PersonDetailsDialog({
         </SheetHeader>
 
         <div className="flex flex-col gap-6 pb-8">
+          <Section label={t("listen")}>
+            <ListenButton
+              personId={person.id}
+              signature={narrationSignature(person)}
+              variant="panel"
+            />
+          </Section>
+
           <Section label={t("maritalStatus", { fallback: "Marital Status" })}>
             <span className="text-sm">
               {person.maritalStatus === "single" && t("statusSingle", { fallback: "Single" })}

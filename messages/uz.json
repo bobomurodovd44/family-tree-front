@@ -237,6 +237,8 @@
     "daughter": "QIZ",
     "mother": "ONA",
     "father": "OTA",
-    "sibling": "AKA-UKA/OPA-SINGIL"
+    "sibling": "AKA-UKA/OPA-SINGIL",
+    "listen": "Tinglash",
+    "listenError": "Ovoz yaratilmadi"
   }
 }

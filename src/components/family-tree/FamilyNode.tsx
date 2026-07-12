@@ -10,10 +10,11 @@ import { useRef, useState } from "react"
 import { motion } from "motion/react"
 
 import { cn } from "@/lib/utils"
-import { lifeYears, personName, type TreePerson } from "@/lib/tree-types"
+import { lifeYears, narrationSignature, personName, type TreePerson } from "@/lib/tree-types"
 import { CARD_H, CARD_W } from "@/lib/tree-layout"
 import { PersonAvatar } from "@/components/people/person-avatar"
 import { Badge } from "@/components/ui/badge"
+import { ListenButton } from "@/components/family-tree/ListenButton"
 
 export interface FamilyNodeProps {
   person: TreePerson
@@ -157,6 +158,14 @@ function FamilyNodeImpl({
           {relationLabel}
         </Badge>
       ) : null}
+
+      {/* Listen: plays the person's spoken Uzbek narration. Self-hides for unsaved placeholders. */}
+      <ListenButton
+        personId={person.id}
+        signature={narrationSignature(person)}
+        variant="card"
+        className="absolute right-2 bottom-2"
+      />
     </motion.div>
   )
 }

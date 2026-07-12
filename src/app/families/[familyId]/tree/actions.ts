@@ -201,6 +201,23 @@ export async function deleteTreePerson(_familyId: string, id: string): Promise<v
   await feathersFetch(`/people/${id}`, { method: "DELETE", token })
 }
 
+/**
+ * Fetch (generating & caching on first call) the person's spoken Uzbek narration. Returns a
+ * presigned audio URL + the narration text, or null on failure. The backend only re-synthesizes
+ * when the person's spoken details change, so repeated calls are cheap.
+ */
+export async function getNarrationAction(
+  personId: string
+): Promise<{ audioUrl: string; text: string } | null> {
+  const token = await getToken()
+  if (!token) return null
+  const { ok, data } = await feathersFetch<{ audioUrl: string; text: string }>(
+    `/narration/${personId}`,
+    { token }
+  )
+  return ok && data?.audioUrl ? { audioUrl: data.audioUrl, text: data.text } : null
+}
+
 /** Upload a cropped photo as a base64 string from the Tree canvas to S3 */
 export async function uploadTreePhotoAction(
   base64: string,

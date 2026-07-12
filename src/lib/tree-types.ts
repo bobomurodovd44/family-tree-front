@@ -77,6 +77,24 @@ export function parentLabel(parentGender: Gender, t: (key: string) => string): s
   return parentGender === "female" ? t("mother") : t("father")
 }
 
+/**
+ * Client-side cache key for a person's narration audio, over the narration-relevant fields the
+ * in-tree form can edit. When it changes, the ListenButton refetches (the backend hash is the
+ * authoritative gate and also covers off-card fields like birthplace/profession across reloads).
+ */
+export function narrationSignature(
+  p: Pick<TreePerson, "firstName" | "middleName" | "lastName" | "birthYear" | "deathYear" | "isLiving">
+): string {
+  return [
+    p.firstName ?? "",
+    p.middleName ?? "",
+    p.lastName ?? "",
+    p.birthYear ?? "",
+    p.deathYear ?? "",
+    p.isLiving ?? "",
+  ].join("|")
+}
+
 // ── Derivation & normalization ──────────────────────────────────────────────────────────────
 
 export interface MarriageEdge {
