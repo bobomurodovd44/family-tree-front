@@ -17,7 +17,8 @@ type Paginated<T> = {
   data: T[]
 }
 
-/** Fetch the current user's families (newest first). Scoped server-side by owner. */
+/** Fetch all families (newest first). Shared workspace: every authenticated user is an admin
+ * and sees every family — the backend applies no owner scoping. */
 export async function getFamilies(): Promise<Family[]> {
   const token = await getToken()
   if (!token) return []
