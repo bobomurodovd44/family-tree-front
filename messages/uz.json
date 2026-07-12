@@ -74,7 +74,7 @@
     "label": "Sahifalar bo'yicha o'tish",
     "previous": "Oldingi",
     "next": "Keyingi",
-    "page": "Sahifa {page} / {pageCount}"
+    "goToPage": "{page}-sahifaga o'tish"
   },
   "Families": {
     "title": "Shajaralar",

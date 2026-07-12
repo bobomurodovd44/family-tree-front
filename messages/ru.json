@@ -74,7 +74,7 @@
     "label": "Постраничная навигация",
     "previous": "Назад",
     "next": "Вперёд",
-    "page": "Страница {page} из {pageCount}"
+    "goToPage": "Перейти на страницу {page}"
   },
   "Families": {
     "title": "Семейные древа",
