@@ -41,7 +41,7 @@ export async function createFamily(
     return { error: t("errors.generic") }
   }
 
-  revalidatePath("/")
+  revalidatePath("/", "layout")
   return { ok: true }
 }
 
@@ -69,7 +69,7 @@ export async function updateFamily(
     return { error: t("errors.generic") }
   }
 
-  revalidatePath("/")
+  revalidatePath("/", "layout")
   return { ok: true }
 }
 
@@ -78,5 +78,5 @@ export async function deleteFamily(id: string): Promise<void> {
   if (!token) return
 
   await feathersFetch(`/families/${id}`, { method: "DELETE", token })
-  revalidatePath("/")
+  revalidatePath("/", "layout")
 }
